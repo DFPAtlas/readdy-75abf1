@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/feature/Header";
 import Footer from "@/components/feature/Footer";
 import { sendDemoLinkEmail, generateDemoLink, generateDemoToken } from "@/lib/demoEmail";
+import { createDemoRequest } from "@/lib/demoDb";
 
 const bookingMethods = [
   "Phone/manual diary",
@@ -97,6 +98,22 @@ export default function DemoRequestPage() {
 
       const demoToken = generateDemoToken();
       const demoLink = generateDemoLink(demoToken);
+
+      // Persist the demo request to the backend database.
+      await createDemoRequest({
+        fisheryName,
+        contactName,
+        email,
+        phone,
+        postcode,
+        numberOfLakes,
+        numberOfSwims,
+        currentBookingMethod: bookingMethod,
+        interests,
+        message,
+        consentToContact: consent,
+        sourcePage: "/demo/request",
+      });
 
       await sendDemoLinkEmail({
         to: email,

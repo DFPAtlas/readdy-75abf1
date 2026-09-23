@@ -51,18 +51,20 @@ A two-sided UK fishing platform connecting anglers with fishery owners:
 - [x] Lake detail page with full sections
 - [x] "Request Demo" navigation links in Header, Footer, FisheryOwner CTA, Final CTA, Lake detail Owner CTA
 - [x] Angler authentication flow (signup, login, auth callback, onboarding, placeholder dashboard, profile)
-- [x] Magic link auth UI with placeholder functions ready for Supabase
+- [x] Magic link auth (Supabase Auth — real signInWithOtp + session handling)
 - [x] SignupPromptModal for gated actions
 - [x] Return URL support for auth flow
 - [x] Member profile form with fishing interests, preferences
-- [ ] User authentication (Supabase)
+- [x] User authentication (Supabase — magic link + member profiles, consents, saved lakes, audit events)
+- [x] Supabase database connected — all 8 tables created with Row Level Security policies
+- [x] Demo request form persists real rows to demo_requests
 - [ ] Angler dashboard (saved lakes, bookings, catch reports)
 - [ ] Fishery owner dashboard (lake management, bookings, members)
 - [ ] Online bookings and payments (Stripe/Shopify)
 - [ ] Catch reports system
 
 ## 4. Data Model Design
-(For Supabase integration later)
+(Tables created in Supabase with Row Level Security — live in the connected project)
 
 ### Table: fisheries
 | Field | Type | Description |
@@ -113,7 +115,7 @@ A two-sided UK fishing platform connecting anglers with fishery owners:
 | number_of_lakes | integer | Number of lakes |
 | number_of_swims | integer | Number of swims |
 | current_booking_method | text | Current booking method |
-| interests_json | text | Selected interests (JSON array) |
+| interests_json | jsonb | Selected interests (JSON array) |
 | message | text | Message/notes |
 | consent_to_contact | boolean | Contact consent |
 | status | text | new/email_sent/viewed_demo/contacted/converted/not_interested/expired |
@@ -170,8 +172,8 @@ A two-sided UK fishing platform connecting anglers with fishery owners:
 | postcode | text | UK postcode (optional) |
 | town | text | Town/area (optional) |
 | preferred_distance_miles | integer | Max travel distance |
-| fishing_interests_json | text | Fishing interests (JSON array) |
-| preferred_booking_types_json | text | Preferred booking types (JSON array) |
+| fishing_interests_json | jsonb | Fishing interests (JSON array) |
+| preferred_booking_types_json | jsonb | Preferred booking types (JSON array) |
 | email_reminders_enabled | boolean | Email reminders toggle |
 | marketing_consent | boolean | Marketing opt-in |
 | onboarding_completed | boolean | Onboarding status |
@@ -195,9 +197,9 @@ A two-sided UK fishing platform connecting anglers with fishery owners:
 | Field | Type | Description |
 |-------|------|-------------|
 | id | uuid | Primary key |
-| member_id | uuid | FK to member_profiles |
+| user_id | uuid | FK to auth.users |
 | lake_id | text | Lake identifier |
-| tenant_id | uuid | Tenant identifier (nullable) |
+| tenant_id | text | Tenant identifier (nullable) |
 | created_at | timestamptz | Saved at |
 
 ### Table: auth_audit_events
